@@ -42,15 +42,26 @@ fn main(req: Request) -> Result<Response, Error> {
         _ => (),
     };
 
-    let index = Asset::get("index.html").ok_or(anyhow!("Failed to read index.html"))?;
+    let path = match req.get_path() {
+        "/" => "index.html",
+        p => p,
+    };
 
-    // Pattern match on the path...
-    match req.get_path().starts_with("/api/") {
-        true => handle_api(req),
-        false => {
-            Ok(Response::from_status(StatusCode::OK)
-                .with_content_type(mime::TEXT_HTML_UTF_8)
-                .with_body(index.data.into_owned()))
+    if path.starts_with("/api/") {
+        handle_api(req)
+    } else {
+        eprintln!("path: {}", path);
+        let path = path.trim_start_matches('/');
+        eprintln!("path: {}", path);
+        match Asset::get(path) {
+            Some(file) => {
+                Ok(Response::from_status(StatusCode::OK)
+                    .with_content_type(mime::TEXT_HTML_UTF_8)
+                    .with_body(file.data.into_owned()))
+            },
+            None => {
+                Ok(Response::from_status(StatusCode::NOT_FOUND).with_body("404"))
+            }
         }
     }
 }
