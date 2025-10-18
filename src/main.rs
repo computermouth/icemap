@@ -1,13 +1,12 @@
 //! Default Compute template program.
 
+use fastly::error::anyhow;
 use fastly::http::{header, Method, StatusCode};
 use fastly::{mime, Body, Error, Request, Response};
-use fastly::error::anyhow;
 use rust_embed::Embed;
 
 fn handle_api(_req: Request) -> Result<Response, Error> {
-    Ok(Response::from_status(StatusCode::OK)
-        .with_body_text_plain("Doing API stuff!\n"))
+    Ok(Response::from_status(StatusCode::OK).with_body_text_plain("Doing API stuff!\n"))
 }
 
 #[derive(Embed)]
@@ -50,18 +49,13 @@ fn main(req: Request) -> Result<Response, Error> {
     if path.starts_with("/api/") {
         handle_api(req)
     } else {
-        eprintln!("path: {}", path);
         let path = path.trim_start_matches('/');
-        eprintln!("path: {}", path);
-        match Asset::get(path) {
-            Some(file) => {
-                Ok(Response::from_status(StatusCode::OK)
-                    .with_content_type(mime::TEXT_HTML_UTF_8)
-                    .with_body(file.data.into_owned()))
-            },
-            None => {
-                Ok(Response::from_status(StatusCode::NOT_FOUND).with_body("404"))
-            }
+        let file = match Asset::get(path) {
+            Some(s) => Some(s),
+            None => Asset::get("index.html"),
         }
+        .ok_or(anyhow!("failed to find or substitute '{}'", path))?;
+
+        Ok(Response::from_status(StatusCode::OK).with_body(file.data.into_owned()))
     }
 }
