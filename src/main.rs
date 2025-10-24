@@ -2,11 +2,12 @@
 
 use fastly::error::anyhow;
 use fastly::http::{header, Method, StatusCode};
-use fastly::{mime, Body, Error, Request, Response};
+use fastly::{mime, Error, Request, Response};
 use rust_embed::Embed;
 
 fn handle_api(_req: Request) -> Result<Response, Error> {
-    Ok(Response::from_status(StatusCode::OK).with_body_text_plain("Doing API stuff!\n"))
+    Ok(Response::from_status(StatusCode::OK)
+        .with_body_text_plain("Doing API stuff!\n"))
 }
 
 #[derive(Embed)]
@@ -46,7 +47,7 @@ fn main(req: Request) -> Result<Response, Error> {
         p => p,
     };
 
-    if path.starts_with("/api/") {
+    if path.starts_with("/api") {
         handle_api(req)
     } else {
         let path = path.trim_start_matches('/');
@@ -56,6 +57,7 @@ fn main(req: Request) -> Result<Response, Error> {
         }
         .ok_or(anyhow!("failed to find or substitute '{}'", path))?;
 
-        Ok(Response::from_status(StatusCode::OK).with_body(file.data.into_owned()))
+        Ok(Response::from_status(StatusCode::OK)
+            .with_body(file.data.into_owned()))
     }
 }
