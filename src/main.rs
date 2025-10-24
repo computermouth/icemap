@@ -10,7 +10,7 @@ fn handle_api(_req: Request) -> Result<Response, Error> {
 }
 
 #[derive(Embed)]
-#[folder = "web/"]
+#[folder = "web/dist/"]
 struct Asset;
 
 /// The entry point for your application.
