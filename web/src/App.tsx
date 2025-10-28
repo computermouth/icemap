@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import './App.css';
+import { NavigationBar } from './components/NavigationBar';
+import { MainSection } from './components/MainSection';
 
 const App = () => {
   const { isLoading, error, data } = useQuery({
@@ -11,18 +12,21 @@ const App = () => {
   });
 
   if (isLoading) {
-    return <p className="content">Loading...</p>
+    return <p className="">Loading...</p>
   }
 
   if (error) {
-    
-    return <p className="content">Error Occured</p>
+
+    return <p className="">Error Occured</p>
   }
 
   return (
-    <div className="content">
-      <h1>{data}</h1>
-    </div>
+    <>
+      <div className="bg-black-80 white vh-100">
+        <NavigationBar />
+        <MainSection />
+      </div>
+    </>
   );
 };
 

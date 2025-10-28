@@ -4,6 +4,7 @@ import { pluginReact } from '@rsbuild/plugin-react';
 export default defineConfig({
   plugins: [pluginReact()],
   html: {
+    title: "Rsbuild title",
     inject: "body",
     scriptLoading: "blocking",
     tags: [
@@ -11,6 +12,12 @@ export default defineConfig({
       tag: "script",
       attrs: {
         type: "text/javascript"
+      }
+    }, {
+      tag: "link",
+      attrs: {
+        href: "https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css",
+        rel: "stylesheet"
       }
     }
   ]
